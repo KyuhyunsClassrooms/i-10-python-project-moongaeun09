@@ -1,101 +1,104 @@
 # AI 활용 자유 주제 파이썬 미니 프로젝트
-# 이름 또는 학번: 
-# 프로젝트 주제: 
+# 이름 또는 학번: 21009 문가은
+# 프로젝트 주제: 가구 배치 프로그램
 
-# ============================================================
-# 사용 안내
-# ------------------------------------------------------------
-# 이 파일은 예시 골격입니다.
-# 그대로 제출하지 말고, 반드시 자신의 주제에 맞게 수정하세요.
-#
-# 필수 조건
-# 1. 2차원 리스트 사용
-# 2. 함수 2개 이상, 가능하면 3개 이상 분리
-# 3. 조건문 사용
-# 4. 반복문 사용
-# 5. 실행 결과 출력
-# ============================================================
+# ==========================================
+# [수행평가] 가구 배치 도우미 - main.py
+# ==========================================
 
-
-# ------------------------------------------------------------
-# 1. 데이터 준비: 2차원 리스트
-# ------------------------------------------------------------
-# 아래 예시는 "활동 추천 프로그램"입니다.
-# 자신의 주제에 맞게 data를 만드세요.
-#
-# 현재 열의 의미:
-# 0번 열: 활동 이름
-# 1번 열: 필요한 시간(분)
-# 2번 열: 추천 기분
-# 3번 열: 활동 유형
-# ------------------------------------------------------------
-
-activities = [
-    ["산책하기", 30, "피곤", "운동"],
-    ["짧은 낮잠", 20, "피곤", "휴식"],
-    ["좋아하는 음악 듣기", 10, "우울", "휴식"],
-    ["문제집 3쪽 풀기", 40, "차분", "공부"],
-    ["방 정리하기", 25, "답답", "생활"],
-    ["친구에게 연락하기", 15, "우울", "소통"],
+# 1. 가구 도감 데이터 (2차원 리스트)
+furniture_list = [
+    [1, "침대", 3, 2],
+    [2, "책상", 2, 2],
+    [3, "옷장", 2, 1]
 ]
 
+# 2. 방 생성 함수
+def create_room(w, h):
+    return [[0] * w for _ in range(h)]
 
-# ------------------------------------------------------------
-# 2. 함수 정의
-# ------------------------------------------------------------
+# 3. 방 출력 함수
+def display_room(room):
+    print("\n--- 🏠 현재 방 배치 상태 ---")
+    for row in room:
+        print(row)
+    print("-------------------------\n")
 
-def show_intro():
-    """프로그램 제목과 안내를 출력한다."""
-    print("=" * 40)
-    print("AI 활용 자유 주제 파이썬 미니 프로젝트")
-    print("예시: 기분과 시간에 따른 활동 추천기")
-    print("=" * 40)
+# 4. 가구 배치 및 검사 함수 (업그레이드 버전)
+def check_and_place(room, f_w, f_h, rotate, start_x, start_y):
+    room_h = len(room)     # 방의 세로 크기
+    room_w = len(room[0])  # 방의 가로 크기
+    
+    # [회전 처리]
+    if rotate == 'Y' or rotate == 'y':
+        f_w, f_h = f_h, f_w
+        print(f"🔄 가구가 회전되었습니다. (가로: {f_w}, 세로: {f_h})")
+        
+    # 🚨 [1단계 검사: 방의 범위를 벗어나는지 체크]
+    if (start_x + f_w > room_w) or (start_y + f_h > room_h):
+        print("❌ [경고] 가구가 방의 범위를 벗어나 배치할 수 없습니다!")
+        return False
 
+    # 🚨 [2단계 검사: 이미 다른 가구와 겹치는지 체크]
+    for y in range(start_y, start_y + f_h):
+        for x in range(start_x, start_x + f_w):
+            if room[y][x] != 0:
+                print("❌ [경고] 이미 그 자리에 다른 가구가 있어서 겹칩니다!")
+                return False
 
-def get_user_input():
-    """사용자에게 기분과 남은 시간을 입력받는다."""
-    mood = input("현재 기분을 입력하세요. 예: 피곤, 우울, 차분, 답답: ")
-    minutes = int(input("사용 가능한 시간을 분 단위로 입력하세요: "))
-    return mood, minutes
+    # 🎉 [3단계 실행: 실제 가구 배치하기]
+    for y in range(start_y, start_y + f_h):
+        for x in range(start_x, start_x + f_w):
+            room[y][x] = 1
+            
+    return True
 
+# ==========================================
+# 5. 메인 실행 흐름 (반복문 활용)
+# ==========================================
+print("🏠 나만의 인테리어 가구 레이아웃 프로그램 🏠")
+room_w = int(input("방의 가로 크기를 입력하세요 (예: 5): "))
+room_h = int(input("방의 세로 크기를 입력하세요 (예: 5): "))
 
-def find_recommendations(data, mood, minutes):
-    """2차원 리스트를 반복하며 조건에 맞는 활동을 찾는다."""
-    results = []
+my_room = create_room(room_w, room_h)
+display_room(my_room)
 
-    for row in data:
-        name = row[0]
-        required_minutes = row[1]
-        recommended_mood = row[2]
-        activity_type = row[3]
-
-        # 조건문: 사용자의 기분과 시간이 활동 조건에 맞는지 판단한다.
-        if recommended_mood == mood and required_minutes <= minutes:
-            results.append([name, required_minutes, activity_type])
-
-    return results
-
-
-def print_result(results):
-    """추천 결과를 출력한다."""
-    print("\n[추천 결과]")
-
-    if len(results) == 0:
-        print("조건에 맞는 활동이 없습니다.")
-        print("시간을 늘리거나 다른 기분을 입력해 보세요.")
-    else:
-        for item in results:
-            print(f"- {item[0]} / {item[1]}분 / 유형: {item[2]}")
-
-
-def main():
-    show_intro()
-    mood, minutes = get_user_input()
-    results = find_recommendations(activities, mood, minutes)
-    print_result(results)
-
-
-# ------------------------------------------------------------
-# 3. 프로그램 실행
-# ------------------------------------------------------------
-main()
+while True:
+    print("----------------------------------------")
+    action = input("가구를 배치하려면 '추가', 끝내려면 '종료'를 입력하세요: ")
+    
+    if action == "종료":
+        print("🎉 인테리어가 완료되었습니다! 프로그램을 종료합니다.")
+        break
+        
+    elif action == "추가":
+        print("\n--- 🛋️ 가구 도감 목록 ---")
+        for item in furniture_list:
+            print(f"번호: {item[0]} | 이름: {item[1]} | 크기: {item[2]}x{item[3]}")
+            
+        choice = int(input("배치할 가구 번호를 선택하세요: "))
+        
+        selected_furniture = None
+        for item in furniture_list:
+            if item[0] == choice:
+                selected_furniture = item
+                break
+                
+        if selected_furniture is None:
+            print("❌ 잘못된 가구 번호입니다. 다시 선택해 주세요.")
+            continue
+            
+        f_name = selected_furniture[1]
+        f_w = selected_furniture[2]
+        f_h = selected_furniture[3]
+        
+        rotate = input(f"{f_name}을 회전하시겠습니까? (Y/N): ")
+        start_x = int(input("배치할 X 좌표를 입력하세요 (0부터 시작): "))
+        start_y = int(input("배치할 Y 좌표를 입력하세요 (0부터 시작): "))
+        
+        success = check_and_place(my_room, f_w, f_h, rotate, start_x, start_y)
+        
+        if success:
+            print(f"✅ {f_name} 배치 성공!")
+        
+        display_room(my_room)
